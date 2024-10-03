@@ -84,6 +84,7 @@ class SingleArm(Manipulator):
         self.recent_ee_vel = None  # Current and last eef velocity
         self.recent_ee_vel_buffer = None  # RingBuffer holding prior 10 values of velocity values
         self.recent_ee_acc = None  # Current and last eef acceleration
+        initial_qpos = np.array ([-0.44227073,  1.04602588, -0.05149248, -1.6102527,  1.04177002,  1.42582655, -2.11462576])
 
         super().__init__(
             robot_type=robot_type,
@@ -175,15 +176,20 @@ class SingleArm(Manipulator):
         # First, run the superclass method to reset the position and controller
         super().reset(deterministic)
 
+        # import ipdb; ipdb.set_trace()
         # Now, reset the gripper if necessary
         if self.has_gripper:
             if not deterministic:
                 self.sim.data.qpos[self._ref_gripper_joint_pos_indexes] = self.gripper.init_qpos
+                print(self.gripper.init_qpos)
 
             self.gripper.current_action = np.zeros(self.gripper.dof)
+            print(self.gripper.current_action)
 
         # Update base pos / ori references in controller
         self.controller.update_base_pose(self.base_pos, self.base_ori)
+        print(self.base_pos)
+        print(self.base_ori)
 
         # # Setup buffers to hold recent values
         self.recent_ee_forcetorques = DeltaBuffer(dim=6)
